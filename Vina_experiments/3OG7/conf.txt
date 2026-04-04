@@ -1,0 +1,9 @@
+receptor = 3OG7.pdbqt
+center_x = 1.85 
+center_y = -2.78
+center_z = -20.09
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 3

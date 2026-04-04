@@ -1,0 +1,9 @@
+receptor = 7DY7.pdbqt
+center_x = 144.00
+center_y = -13.52
+center_z = 21.31
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 1

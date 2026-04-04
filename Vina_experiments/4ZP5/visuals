@@ -1,0 +1,131 @@
+# ==============================================================================
+# INSTALLATION FOR MAC/LINUX:
+# Run this in your terminal: python3 -m pip install pandas matplotlib seaborn
+# ==============================================================================
+
+import os
+import re
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def parse_docking_results(results_dir):
+    """
+    Scans the results directory. 
+    Prioritizes .log files, but falls back to extracting scores from _out.pdbqt 
+    files if logs are missing.
+    """
+    data = []
+    
+    # Debugging: Show the user which directory is being searched
+    search_path = os.path.abspath(results_dir)
+    print(f"Searching for results in: {search_path}")
+
+    if not os.path.exists(results_dir):
+        print(f"ERROR: Directory '{results_dir}' not found.")
+        print("Ensure your 'run_batch_docking.sh' finished successfully.")
+        return pd.DataFrame()
+        
+    # Recursively check subdirectories if the batch script creates them
+    for root, dirs, files in os.walk(results_dir):
+        for file in files:
+            affinity = None
+            ligand_name = None
+            
+            # Method 1: Parse .log files
+            if file.endswith(".log"):
+                ligand_name = file.replace(".log", "")
+                log_path = os.path.join(root, file)
+                try:
+                    with open(log_path, 'r') as f:
+                        content = f.read()
+                        # Vina results table starts with '1' and then the score
+                        match = re.search(r'\s+1\s+(-?\d+\.\d+)', content)
+                        if match:
+                            affinity = float(match.group(1))
+                except Exception:
+                    continue
+
+            # Method 2: Parse _out.pdbqt files (Fallback)
+            elif file.endswith("_out.pdbqt"):
+                potential_name = file.replace("_out.pdbqt", "")
+                # Skip if we already processed the log for this ligand in this session
+                if any(d['Ligand'] == potential_name for d in data):
+                    continue
+                    
+                ligand_name = potential_name
+                pdbqt_path = os.path.join(root, file)
+                try:
+                    with open(pdbqt_path, 'r') as f:
+                        for line in f:
+                            if "REMARK VINA RESULT:" in line:
+                                # REMARK VINA RESULT: -7.2 0.000 0.000
+                                parts = line.split()
+                                affinity = float(parts[3])
+                                break 
+                except Exception:
+                    continue
+
+            if ligand_name and affinity is not None:
+                data.append({'Ligand': ligand_name, 'Affinity': affinity})
+    
+    return pd.DataFrame(data)
+
+def create_visualizations(df):
+    if df.empty:
+        print("\n[!] No docking data found. Things to check:")
+        print("1. Did 'run_batch_docking.sh' create a 'Docking_Results' folder?")
+        print("2. Are there .log or _out.pdbqt files inside that folder?")
+        return
+
+    # Sort: Strongest binding (most negative) at the top
+    df = df.sort_values(by='Affinity', ascending=True)
+
+    # UI Settings
+    sns.set_theme(style="whitegrid")
+    
+    # Compact height settings (multiplier 0.25)
+    chart_height = max(5, len(df) * 0.25)
+    plt.figure(figsize=(8, chart_height)) 
+    
+    # Create Plot
+    ax = sns.barplot(
+        x='Affinity', 
+        y='Ligand', 
+        data=df, 
+        hue='Ligand', 
+        palette="viridis", 
+        legend=False,
+        width=0.8
+    )
+    
+    plt.title('Vina Docking Results: 4ZP5 MAPK4K', fontsize=12)
+    plt.xlabel('Affinity (kcal/mol)', fontsize=10)
+    plt.ylabel('Ligand', fontsize=10)
+    
+    plt.xticks(fontsize=9)
+    plt.yticks(fontsize=9)
+    
+    # Add numerical labels to bars
+    for i in ax.containers:
+        ax.bar_label(i, padding=3, fmt='%.2f', fontsize=8)
+
+    plt.tight_layout()
+    
+    output_img = 'docking_results_for_4ZP5.png'
+    plt.savefig(output_img, dpi=300)
+    
+    print("\n--- Docking Results Summary ---")
+    print(df.to_string(index=False))
+    print(f"\nVisual chart saved as: {output_img}")
+    
+    # Display the plot window
+    plt.show()
+
+if __name__ == "__main__":
+    # Ensure this matches the OUTPUT_DIR in your run_batch_docking.sh
+    # By default, it looks for "Docking_Results" in the same folder as this script
+    RESULTS_FOLDER = "results" 
+    
+    results_df = parse_docking_results(RESULTS_FOLDER)
+    create_visualizations(results_df)

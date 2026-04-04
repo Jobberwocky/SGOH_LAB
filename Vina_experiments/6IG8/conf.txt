@@ -1,0 +1,9 @@
+receptor = 6IG8.pdbqt
+center_x = -2.28
+center_y = 18.39
+center_z = -16.78
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 1

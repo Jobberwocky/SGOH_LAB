@@ -1,0 +1,9 @@
+receptor = 5AX3.pdbqt
+center_x = 16.07
+center_y = -6.56
+center_z = -15.78
+size_x = 20
+size_y = 20 
+size_z = 20 
+exhaustiveness = 8
+num_modes = 3

@@ -1,0 +1,9 @@
+receptor = 3PEG.pdbqt
+center_x = 83.20
+center_y = -9.85
+center_z = 29.11
+size_x = 20
+size_y = 20 
+size_z = 20
+exhaustiveness = 8
+num_modes = 3

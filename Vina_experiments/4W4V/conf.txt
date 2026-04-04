@@ -1,0 +1,9 @@
+receptor = 4W4V
+center_x = 73.95
+center_y = 77.80
+center_z = 33.37
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 1

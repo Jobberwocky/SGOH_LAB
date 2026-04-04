@@ -1,0 +1,11 @@
+receptor = 9CK0.pdbqt
+center_x = -23.58
+center_y = -21.47
+center_z = 11.01
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 1
+
+

@@ -1,0 +1,150 @@
+import os
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def parse_vina_experiments(main_folder, normalize=True):
+    """
+    Parses docking results, exports CSV dataframes, and generates a heatmap.
+    Ligands are placed on the horizontal axis and sorted alphanumerically.
+    Optimized for LaTeX: Maximized dimensions and top-aligned legends.
+    """
+    all_data = []
+    
+    # --- 1. MAPPING & CONFIGURATION ---
+    PATHWAY_MAP = {
+        "3W2S": "RECEPTOR LAYER", "9UHC": "RECEPTOR LAYER", "6IG8": "RECEPTOR LAYER", "7DY7": "RECEPTOR LAYER",
+        "1D8D": "LAYER 1", "4OBE": "LAYER 1", "7MU6": "LAYER 1", "3CGO": "LAYER 1", "3PEG": "LAYER 1", 
+        "3OG7": "LAYER 2",
+        "7JUR": "LAYER 3",
+        "5AX3": "LAYER 4",
+        "8OUR": "LAYER 5",
+        "2W4K": "LAYER 6",
+        "9FT9": "LAYER 7", "3FI2": "LAYER 7", "4W4V": "LAYER 7", "4R3C": "LAYER 7", "4EYM": "LAYER 7", 
+        "4ZP5": "LAYER 8", "3FHR": "LAYER 8",
+        "2D82": "NUCLEAR LAYER", "9CK0": "NUCLEAR LAYER", "4R8Q": "NUCLEAR LAYER", "6KZ5": "NUCLEAR LAYER", "7CMM": "NUCLEAR LAYER", "1KEJ": "NUCLEAR LAYER",
+        "1UA2": "GROWTH", "8I0L": "GROWTH", "1SA0": "GROWTH", 
+        "6OHU": "CHOLESTEROL"
+    }
+    
+    GROUP_ORDER = [
+        "RECEPTOR LAYER", "LAYER 1", "LAYER 2", "LAYER 3", "LAYER 4", 
+        "LAYER 5", "LAYER 6", "LAYER 7", "LAYER 8", "NUCLEAR LAYER", 
+        "GROWTH", "CHOLESTEROL"
+    ]
+
+    PATHWAY_COLORS = {
+        "RECEPTOR LAYER": "#ff9999", "LAYER 1": "#ff4d4d", "LAYER 2": "#cc0000",
+        "LAYER 3": "#ffcc99", "LAYER 4": "#ffb366", "LAYER 5": "#ff9933",
+        "LAYER 6": "#ffff99", "LAYER 7": "#99ff99", "LAYER 8": "#66ff66",
+        "NUCLEAR LAYER": "#99ccff", "GROWTH": "#c2c2f0", "CHOLESTEROL": "#d9d9d9",
+        "Uncategorized": "#f0f0f0"
+    }
+
+    abs_main = os.path.abspath(main_folder)
+    print(f"--- Scanning: {abs_main} ---")
+
+    # --- 2. DATA CRAWLING ---
+    for root, dirs, files in os.walk(abs_main):
+        if os.path.basename(root).lower() == "results":
+            receptor_label = os.path.basename(os.path.dirname(root))
+            pathway = "Uncategorized"
+            for key, val in PATHWAY_MAP.items():
+                if key.lower() in receptor_label.lower():
+                    pathway = val
+                    break
+
+            for file in files:
+                if file.endswith("_out.pdbqt"):
+                    try:
+                        with open(os.path.join(root, file), 'r') as f:
+                            for line in f:
+                                if "REMARK VINA RESULT:" in line:
+                                    score = float(line.split()[3])
+                                    all_data.append({
+                                        "Pathway": pathway,
+                                        "Receptor": receptor_label,
+                                        "Ligand": file.replace("_out.pdbqt", "").replace("*", ""),
+                                        "Affinity": score
+                                    })
+                                    break
+                    except: continue
+
+    if not all_data:
+        print("Error: No .pdbqt files found in 'results' subfolders.")
+        return
+
+    # --- 3. DATAFRAME GENERATION & EXPORT ---
+    df = pd.DataFrame(all_data)
+    df.to_csv("docking_results_long.csv", index=False)
+    
+    df_pivot = df.pivot(index="Receptor", columns="Ligand", values="Affinity")
+    df_pivot = df_pivot.apply(lambda col: col.fillna(col.mean() if not col.isnull().all() else -5.0), axis=0)
+    
+    receptor_to_pathway = df.set_index('Receptor')['Pathway'].to_dict()
+    def sort_key_receptor(receptor):
+        path = receptor_to_pathway.get(receptor, "Uncategorized")
+        idx = GROUP_ORDER.index(path) if path in GROUP_ORDER else len(GROUP_ORDER)
+        return (idx, receptor)
+
+    sorted_receptors = sorted(df_pivot.index, key=sort_key_receptor)
+    sorted_ligands = sorted(df_pivot.columns)
+    
+    df_pivot = df_pivot.loc[sorted_receptors, sorted_ligands]
+    df_pivot.to_csv("docking_results_table.csv")
+
+    # --- 4. VISUALIZATION ---
+    if normalize:
+        plot_df = df_pivot.apply(lambda x: (x - x.mean()) / x.std() if x.std() != 0 else x - x.mean(), axis=1)
+        plot_df = plot_df.fillna(0)
+    else:
+        plot_df = df_pivot
+
+    row_colors = [PATHWAY_COLORS.get(receptor_to_pathway[idx], "#f0f0f0") for idx in plot_df.index]
+
+    num_ligands = len(plot_df.columns)
+    num_receptors = len(plot_df.index)
+    
+    # MAXIMIZING SCALE:
+    # Increased multipliers to ensure cells are large enough for high-res printing
+    width = max(15, num_ligands * 0.5 + 2)
+    height = max(12, num_receptors * 0.6 + 4) 
+
+    # Set style to "talk" for thicker lines and larger default font sizes
+    sns.set_context("talk", font_scale=0.8)
+    
+    g = sns.clustermap(
+        plot_df, 
+        row_cluster=False, 
+        col_cluster=False, 
+        row_colors=row_colors,
+        annot=True, 
+        fmt=".1f", 
+        cmap="YlGnBu_r", 
+        linewidths=0.2, # Thinner lines to give more room to numbers
+        figsize=(width, height),
+        cbar_kws={'label': 'Z-Score' if normalize else 'kcal/mol', 'orientation': 'horizontal'},
+        cbar_pos=(0.1, 0.94, 0.25, 0.02), 
+        annot_kws={"size": 9, "weight": "bold"} # Bold annotations for better visibility
+    )
+
+    # Label adjustments
+    plt.setp(g.ax_heatmap.get_xticklabels(), rotation=90, ha='center', fontsize=10)
+    plt.setp(g.ax_heatmap.get_yticklabels(), rotation=0, fontsize=10)
+    
+    from matplotlib.patches import Patch
+    legend_elements = [Patch(facecolor=PATHWAY_COLORS[p], label=p) for p in GROUP_ORDER if p in df['Pathway'].unique()]
+    
+    # Expanded legend spanning the top
+    g.ax_heatmap.legend(handles=legend_elements, title="Pathway Layers", 
+                        bbox_to_anchor=(0.4, 1.02, 0.6, 0.1), loc='lower left', 
+                        ncol=4, mode="expand", borderaxespad=0.,
+                        fontsize='small', title_fontsize='medium')
+
+    # Use pad_inches=0 to remove every bit of border whitespace
+    plt.savefig("ordered_layer_heatmap.png", dpi=300, bbox_inches='tight', pad_inches=0.05)
+    print("✅ Saved: 'ordered_layer_heatmap.png' (Maximized Dimensions)")
+    plt.show()
+
+if __name__ == "__main__":
+    parse_vina_experiments("Vina_experiments", normalize=True)

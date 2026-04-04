@@ -1,0 +1,9 @@
+receptor = 3FI2.pdbqt
+center_x = 8.56
+center_y = 35.87
+center_z = 12.02
+size_x = 20
+size_y = 20 
+size_z = 20
+exhaustiveness = 8
+num_modes = 1

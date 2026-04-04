@@ -1,0 +1,9 @@
+receptor = 2W4K.pdbqt
+center_x = -11.98
+center_y = 11.56
+center_z = -16.83
+size_x = 20
+size_y = 20 
+size_z = 20
+exhaustiveness = 8
+num_modes = 1

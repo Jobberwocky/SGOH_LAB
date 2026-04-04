@@ -1,0 +1,38 @@
+MODEL 1
+REMARK VINA RESULT:    -7.621      0.000      0.000
+REMARK INTER + INTRA:          -9.074
+REMARK INTER:                  -8.512
+REMARK INTRA:                  -0.562
+REMARK UNBOUND:                -0.562
+REMARK  Name = 0a.sdf
+REMARK  2 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK    1  A    between atoms: N_7  and  C_10
+REMARK    2  A    between atoms: C_10  and  C_11
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  C   UNL     1      23.236   7.944  31.133  0.00  0.00    -0.061 A 
+ATOM      2  C   UNL     1      23.794   8.970  31.886  0.00  0.00    -0.060 A 
+ATOM      3  C   UNL     1      22.983   9.819  32.653  0.00  0.00    -0.038 A 
+ATOM      4  C   UNL     1      21.596   9.608  32.649  0.00  0.00    +0.049 A 
+ATOM      5  C   UNL     1      21.026   8.554  31.922  0.00  0.00    -0.000 A 
+ATOM      6  C   UNL     1      21.859   7.718  31.152  0.00  0.00    -0.053 A 
+ATOM      7  N   UNL     1      20.546  10.297  33.240  0.00  0.00    -0.342 N 
+ATOM      8  C   UNL     1      19.359   9.652  32.978  0.00  0.00    +0.006 A 
+ATOM      9  C   UNL     1      19.626   8.577  32.162  0.00  0.00    -0.036 A 
+ENDROOT
+BRANCH   7  10
+ATOM     10  C   UNL     1      20.621  11.593  33.913  0.00  0.00    +0.048 C 
+BRANCH  10  11
+ATOM     11  C   UNL     1      20.464  12.740  32.948  0.00  0.00    -0.028 A 
+ATOM     12  C   UNL     1      21.581  13.264  32.282  0.00  0.00    -0.056 A 
+ATOM     13  C   UNL     1      21.469  14.412  31.499  0.00  0.00    -0.047 A 
+ATOM     14  C   UNL     1      20.231  15.035  31.361  0.00  0.00    +0.018 A 
+ATOM     15  C   UNL     1      19.096  14.489  31.952  0.00  0.00    -0.047 A 
+ATOM     16  C   UNL     1      19.211  13.341  32.741  0.00  0.00    -0.056 A 
+ATOM     17 BR   UNL     1      20.103  16.661  30.404  0.00  0.00    -0.050 Br
+ENDBRANCH  10  11
+ENDBRANCH   7  10
+TORSDOF 2
+ENDMDL

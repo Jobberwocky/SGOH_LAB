@@ -1,0 +1,9 @@
+receptor = 1UA2.pdbqt
+center_x = 40.92
+center_y = -4.61 
+center_z = 23.46
+size_x = 20 
+size_y = 20
+size_z = 20 
+exhaustiveness = 8
+num_modes = 3

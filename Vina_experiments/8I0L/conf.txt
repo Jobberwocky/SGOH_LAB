@@ -1,0 +1,9 @@
+receptor = 8I0L.pdbqt
+center_x = 53.38
+center_y = -16.59
+center_z = -12.30
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 3

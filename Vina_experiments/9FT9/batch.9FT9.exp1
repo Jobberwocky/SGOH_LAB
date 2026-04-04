@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# ----------------------------------------------------------------------
+# BATCH DOCKING EXECUTION SCRIPT (Subfolder Optimized)
+# ----------------------------------------------------------------------
+
+# 1. SETTINGS
+RECEPTOR="9FT9.pdbqt"        # Located in the project folder
+CONFIG="conf.txt"            # Located in the project folder
+LIGAND_DIR="Ligands"         # Your subfolder containing ligands
+OUTPUT_DIR="results"         # Where results will be saved
+
+# 2. PREPARATION
+mkdir -p "$OUTPUT_DIR"
+
+echo "Checking environment..."
+echo "Current Directory: $(pwd)"
+
+# Check if receptor exists in this main folder
+if [ ! -f "$RECEPTOR" ]; then
+    echo "ERROR: Receptor file '$RECEPTOR' not found in the project folder!"
+    exit 1
+fi
+
+# Check if ligand directory exists
+if [ ! -d "$LIGAND_DIR" ]; then
+    echo "ERROR: Ligand folder '$LIGAND_DIR' not found!"
+    exit 1
+fi
+
+echo "--------------------------------------------------------"
+echo "Starting Batch Docking..."
+
+# 3. THE LOOP
+# We explicitly tell the loop to look inside the "ligands" subfolder
+for LIGAND_PATH in "$LIGAND_DIR"/*.pdbqt; do
+    
+    # Check if any .pdbqt files actually exist in that subfolder
+    [ -e "$LIGAND_PATH" ] || { echo "No .pdbqt files found in $LIGAND_DIR"; break; }
+
+    # Extract just the filename (e.g., "ligand1.pdbqt") without the folder path
+    LIGAND_FILE=$(basename "$LIGAND_PATH")
+
+    # SAFETY CHECK: Skip the receptor file if it happens to be in there
+    if [[ "$LIGAND_FILE" == "$RECEPTOR" ]]; then
+        continue
+    fi
+
+    # Create clean filenames for output and logs
+    BASE_NAME="${LIGAND_FILE%.pdbqt}"
+    OUT_FILE="$OUTPUT_DIR/${BASE_NAME}_out.pdbqt"
+    LOG_FILE="$OUTPUT_DIR/${BASE_NAME}.log"
+
+    echo "Docking ligand: $LIGAND_FILE"
+
+    # 4. EXECUTE VINA
+    # Note: We use $LIGAND_PATH so Vina knows to look inside the subfolder
+    vina --receptor "$RECEPTOR" \
+         --ligand "$LIGAND_PATH" \
+         --config "$CONFIG" \
+         --out "$OUT_FILE" 
+
+    if [ -f "$OUT_FILE" ]; then
+        echo "SUCCESS: Saved to $OUT_FILE"
+    else
+        echo "FAILED: Check $LOG_FILE"
+    fi
+    
+    echo "--------------------------------------------------------"
+done
+
+echo "Batch docking process finished. Results are in the '$OUTPUT_DIR' folder."

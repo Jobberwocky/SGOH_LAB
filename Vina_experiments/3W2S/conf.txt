@@ -1,0 +1,9 @@
+receptor = 3W2S.pdbqt
+center_x = 5.20
+center_y = 0.99
+center_z = 10.29
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness=8
+num_modes=3

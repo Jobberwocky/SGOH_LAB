@@ -1,0 +1,25 @@
+MODEL 1
+REMARK VINA RESULT:    -5.129      0.000      0.000
+REMARK INTER + INTRA:          -5.129
+REMARK INTER:                  -5.129
+REMARK INTRA:                   0.000
+REMARK UNBOUND:                 0.000
+REMARK  Name = 0.sdf
+REMARK  0 active torsions:
+REMARK  status: ('A' for Active; 'I' for Inactive)
+REMARK                            x       y       z     vdW  Elec       q    Type
+REMARK                         _______ _______ _______ _____ _____    ______ ____
+ROOT
+ATOM      1  C   UNL     1     115.529  86.554   4.850  0.00  0.00    -0.061 A 
+ATOM      2  C   UNL     1     115.349  86.378   3.479  0.00  0.00    -0.060 A 
+ATOM      3  C   UNL     1     116.209  86.980   2.555  0.00  0.00    -0.038 A 
+ATOM      4  C   UNL     1     117.251  87.768   3.059  0.00  0.00    +0.046 A 
+ATOM      5  C   UNL     1     117.454  87.963   4.425  0.00  0.00    -0.000 A 
+ATOM      6  C   UNL     1     116.578  87.342   5.336  0.00  0.00    -0.053 A 
+ATOM      7  N   UNL     1     118.231  88.475   2.399  0.00  0.00    -0.361 N 
+ATOM      8  C   UNL     1     119.041  89.116   3.299  0.00  0.00    +0.003 A 
+ATOM      9  C   UNL     1     118.586  88.814   4.562  0.00  0.00    -0.037 A 
+ATOM     10  H   UNL     1     118.336  88.513   1.421  0.00  0.00    +0.000 HD
+ENDROOT
+TORSDOF 0
+ENDMDL

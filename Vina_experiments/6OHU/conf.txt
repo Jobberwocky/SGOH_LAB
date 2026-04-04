@@ -1,0 +1,10 @@
+receptor = 6OHU.pdbqt
+center_x = -13.27
+center_y = 9.14
+center_z = 26.06
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness = 8
+num_modes = 1
+

@@ -1,0 +1,10 @@
+receptor = 1D8D.pdbqt
+center_x = 105.64
+center_y = 25.05
+center_z = 32.15
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness=8
+num_modes=3
+

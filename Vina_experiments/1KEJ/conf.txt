@@ -1,0 +1,10 @@
+receptor = 1KEJ.pdbqt
+center_x = 37.15
+center_y = 50.86
+center_z = 73.74
+size_x = 20
+size_y = 20
+size_z = 20
+exhaustiveness=8
+num_modes=3
+
